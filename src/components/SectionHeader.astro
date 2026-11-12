@@ -1,0 +1,55 @@
+---
+/**
+ * Notebook-style section header: "01 — Work" in mono with a hairline rule,
+ * followed by the real <h2>.
+ */
+interface Props {
+  number: number;
+  label: string;
+  heading: string;
+  headingId: string;
+  intro?: string;
+}
+
+const { number, label, heading, headingId, intro } = Astro.props;
+const index = String(number).padStart(2, '0');
+---
+
+<header class="section-header">
+  <p class="label section-label" aria-hidden="true">
+    <span class="section-number">{index}</span> — {label}
+  </p>
+  <h2 id={headingId}>{heading}</h2>
+  {intro && <p class="section-intro">{intro}</p>}
+</header>
+
+<style>
+  .section-header {
+    margin-bottom: var(--space-7);
+  }
+
+  .section-label {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-bottom: var(--space-4);
+  }
+
+  .section-number {
+    color: var(--color-accent-text);
+  }
+
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    margin-left: var(--space-3);
+    background: var(--color-border);
+  }
+
+  .section-intro {
+    max-width: var(--width-prose);
+    margin-top: var(--space-4);
+    color: var(--color-text-muted);
+  }
+</style>

@@ -1,0 +1,221 @@
+---
+import ThemeToggle from './ThemeToggle.astro';
+import { site } from '../data/site';
+---
+
+<header class="nav">
+  <div class="container nav-inner">
+    <a class="logo" href="/" aria-label={`${site.name}, home`}>
+      <span class="logo-mark" aria-hidden="true"></span>
+      {site.shortName}
+    </a>
+
+    <div class="nav-actions">
+      <button
+        class="menu-button"
+        type="button"
+        aria-expanded="false"
+        aria-controls="nav-menu"
+        data-menu-button>
+        <span class="menu-button-label">Menu</span>
+        <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+          <path class="bar bar-top" d="M2 5h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+          ></path>
+          <path class="bar bar-bottom" d="M2 11h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+          ></path>
+        </svg>
+      </button>
+
+      <nav id="nav-menu" class="nav-menu" aria-label="Primary" data-menu>
+        <ul role="list" class="nav-list">
+          {
+            site.nav.map((item) => (
+              <li>
+                <a class="nav-link link-quiet" href={item.href}>
+                  {item.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+
+      <ThemeToggle />
+    </div>
+  </div>
+</header>
+
+<script>
+  const button = document.querySelector<HTMLButtonElement>('[data-menu-button]');
+  const menu = document.querySelector<HTMLElement>('[data-menu]');
+
+  if (button && menu) {
+    const setOpen = (open: boolean) => {
+      button.setAttribute('aria-expanded', String(open));
+      menu.dataset.open = String(open);
+    };
+
+    button.addEventListener('click', () => {
+      setOpen(button.getAttribute('aria-expanded') !== 'true');
+    });
+
+    // Close after choosing a link, on Escape, and when switching to desktop width.
+    menu.addEventListener('click', (event) => {
+      if ((event.target as HTMLElement).closest('a')) setOpen(false);
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && button.getAttribute('aria-expanded') === 'true') {
+        setOpen(false);
+        button.focus();
+      }
+    });
+
+    window.matchMedia('(min-width: 48rem)').addEventListener('change', () => setOpen(false));
+  }
+</script>
+
+<style>
+  .nav {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: var(--color-bg);
+    border-bottom: var(--border);
+  }
+
+  .nav-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    height: var(--nav-height);
+  }
+
+  .logo {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-weight: var(--weight-semibold);
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+  }
+
+  /* A tiny square "component" — the one bit of hardware in the logo. */
+  .logo-mark {
+    width: 0.625rem;
+    height: 0.625rem;
+    border: 1.5px solid currentColor;
+    border-radius: 2px;
+    position: relative;
+  }
+
+  .logo-mark::after {
+    content: '';
+    position: absolute;
+    inset: 1.5px;
+    background: var(--color-accent);
+    border-radius: 1px;
+  }
+
+  .nav-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  .nav-list {
+    display: flex;
+    gap: var(--space-5);
+  }
+
+  .nav-link {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+  }
+
+  .nav-link:hover,
+  .nav-link:focus-visible {
+    color: var(--color-text);
+  }
+
+  .menu-button {
+    display: none;
+  }
+
+  /* ---------- Mobile: collapse into a disclosure menu (only when JS is on) ---------- */
+  @media (max-width: 47.99rem) {
+    :global(.js) .menu-button {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      height: 2.5rem;
+      padding-inline: var(--space-3);
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      letter-spacing: var(--tracking-label);
+      color: var(--color-text);
+      background: transparent;
+      border: var(--border);
+      border-radius: var(--radius-md);
+    }
+
+    .bar {
+      transition: transform var(--duration-base) var(--ease-spring);
+      transform-origin: center;
+    }
+
+    .menu-button[aria-expanded='true'] .bar-top {
+      transform: translateY(3px) rotate(45deg);
+    }
+
+    .menu-button[aria-expanded='true'] .bar-bottom {
+      transform: translateY(-3px) rotate(-45deg);
+    }
+
+    :global(.js) .nav-menu {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: var(--color-bg);
+      border-bottom: var(--border);
+      display: none;
+    }
+
+    :global(.js) .nav-menu[data-open='true'] {
+      display: block;
+      animation: drop-in var(--duration-base) var(--ease-out);
+    }
+
+    :global(.js) .nav-list {
+      flex-direction: column;
+      gap: 0;
+      padding: var(--space-2) var(--gutter) var(--space-4);
+    }
+
+    :global(.js) .nav-list li + li {
+      border-top: var(--border);
+    }
+
+    :global(.js) .nav-link {
+      display: block;
+      padding-block: var(--space-3);
+      font-size: var(--text-base);
+      color: var(--color-text);
+      background-image: none;
+    }
+
+    /* Without JS: keep links visible, just tighter. */
+    :global(html:not(.js)) .nav-list {
+      gap: var(--space-3);
+    }
+  }
+
+  @keyframes drop-in {
+    from {
+      opacity: 0;
+      transform: translateY(-6px);
+    }
+  }
+</style>

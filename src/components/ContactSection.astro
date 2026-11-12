@@ -1,0 +1,80 @@
+---
+import SectionHeader from './SectionHeader.astro';
+import { site, sections } from '../data/site';
+
+const copy = sections.contact;
+---
+
+<section id="contact" class="section container" aria-labelledby="contact-title">
+  <SectionHeader number={4} label={copy.label} heading={copy.heading} headingId="contact-title" />
+
+  <p class="contact-intro">{copy.intro}</p>
+
+  <p class="contact-email">
+    <a class="link" href={`mailto:${site.email}`}>{site.email}</a>
+  </p>
+
+  <ul class="contact-links" role="list">
+    {
+      site.socials.map((social) => (
+        <li>
+          <span class="label contact-label">{social.label}</span>
+          <a class="link-quiet" href={social.href} rel="noopener me">
+            {social.handle}
+            <span class="arrow" aria-hidden="true">
+              ↗
+            </span>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</section>
+
+<style>
+  .section {
+    padding-top: var(--section-gap);
+  }
+
+  .contact-intro {
+    max-width: var(--width-prose);
+    font-size: var(--text-lg);
+    line-height: 1.6;
+  }
+
+  .contact-email {
+    margin-top: var(--space-6);
+    font-size: var(--text-2xl);
+    font-weight: var(--weight-medium);
+    letter-spacing: -0.015em;
+    line-height: 1.3;
+  }
+
+  .contact-links {
+    display: grid;
+    gap: var(--space-3);
+    margin-top: var(--space-6);
+  }
+
+  .contact-links li {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-4);
+  }
+
+  .contact-label {
+    min-width: 5.5rem;
+  }
+
+  .arrow {
+    display: inline-block;
+    margin-left: var(--space-1);
+    color: var(--color-text-muted);
+    transition: transform var(--duration-base) var(--ease-spring);
+  }
+
+  .contact-links a:hover .arrow,
+  .contact-links a:focus-visible .arrow {
+    transform: translate(2px, -2px);
+  }
+</style>

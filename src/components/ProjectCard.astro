@@ -1,0 +1,144 @@
+---
+import { Image } from 'astro:assets';
+import type { CollectionEntry } from 'astro:content';
+import TagList from './TagList.astro';
+
+interface Props {
+  project: CollectionEntry<'projects'>;
+  index: number;
+  /** Eagerly load the first images (above the fold on mobile). */
+  eager?: boolean;
+}
+
+const { project, index, eager = false } = Astro.props;
+const { title, impact, stack, cover, coverAlt, kind, year } = project.data;
+const number = String(index + 1).padStart(2, '0');
+const headingId = `project-${project.id}`;
+---
+
+<article class="card" aria-labelledby={headingId}>
+  <div class="card-media">
+    <Image
+      src={cover}
+      alt={coverAlt}
+      widths={[480, 720, 1080]}
+      sizes="(min-width: 48rem) 540px, 100vw"
+      loading={eager ? 'eager' : 'lazy'}
+    />
+  </div>
+  <div class="card-body">
+    <p class="label card-meta">
+      <span class="card-number">P/{number}</span>
+      <span aria-hidden="true">·</span>
+      {year}
+      <span aria-hidden="true">·</span>
+      {kind}
+    </p>
+    <h3 id={headingId} class="card-title">
+      <a class="card-link" href={`/projects/${project.id}/`}>{title}</a>
+    </h3>
+    <p class="card-impact">{impact}</p>
+    <TagList tags={stack} />
+  </div>
+</article>
+
+<style>
+  .card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+    transition: transform var(--duration-slow) var(--ease-spring);
+  }
+
+  .card-media {
+    overflow: hidden;
+    aspect-ratio: 3 / 2;
+    background: var(--color-surface);
+    border: var(--border);
+    border-radius: var(--radius-md);
+    transition: border-color var(--duration-base) var(--ease-out);
+  }
+
+  .card-media :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .card-body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .card-number {
+    color: var(--color-accent-text);
+  }
+
+  .card-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .card-title {
+    font-size: var(--text-xl);
+  }
+
+  /* The title link covers the whole card, so the card is one clean tab stop. */
+  .card-link {
+    background-image: linear-gradient(currentColor, currentColor);
+    background-size: 0% 1.5px;
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    transition: background-size var(--duration-base) var(--ease-out);
+  }
+
+  .card-link::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: var(--radius-md);
+  }
+
+  .card-link:focus-visible {
+    outline: none;
+  }
+
+  .card-link:focus-visible::after {
+    outline: 2px solid var(--color-accent-text);
+    outline-offset: 6px;
+  }
+
+  .card-impact {
+    color: var(--color-text-muted);
+  }
+
+  .card :global(.tags) {
+    margin-top: var(--space-1);
+  }
+
+  /* Hover / focus: gentle spring lift */
+  .card:hover,
+  .card:focus-within {
+    transform: translateY(-6px);
+  }
+
+  .card:hover .card-media,
+  .card:focus-within .card-media {
+    border-color: var(--color-border-strong);
+  }
+
+  .card:hover .card-link,
+  .card:focus-within .card-link {
+    background-size: 100% 1.5px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .card:hover,
+    .card:focus-within {
+      transform: none;
+    }
+  }
+</style>

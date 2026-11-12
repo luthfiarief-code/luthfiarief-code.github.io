@@ -1,0 +1,89 @@
+---
+/** "● Open to internships · Currently …" with a slowly pulsing indicator LED. */
+interface Props {
+  label: string;
+  detail?: string;
+}
+
+const { label, detail } = Astro.props;
+---
+
+<p class="status">
+  <span class="led" aria-hidden="true"></span>
+  <span class="status-label">{label}</span>
+  {
+    detail && (
+      <>
+        <span class="status-sep" aria-hidden="true">
+          ·
+        </span>
+        <span class="status-detail">{detail}</span>
+      </>
+    )
+  }
+</p>
+
+<style>
+  .status {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-1) var(--space-2);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: var(--tracking-label);
+    color: var(--color-text-muted);
+  }
+
+  .status-label {
+    color: var(--color-text);
+  }
+
+  .led {
+    position: relative;
+    width: 0.5rem;
+    height: 0.5rem;
+    margin-right: var(--space-1);
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: var(--color-accent);
+    animation: led-pulse 2.8s ease-in-out infinite;
+  }
+
+  /* A thin bezel ring, like an LED sitting in its housing. */
+  .led::after {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    border: 1px solid var(--color-border-strong);
+    border-radius: 50%;
+  }
+
+  @keyframes led-pulse {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.35;
+    }
+  }
+
+  /* Narrow screens: the detail drops to its own line, aligned under the label. */
+  @media (max-width: 34rem) {
+    .status-sep {
+      display: none;
+    }
+
+    .status-detail {
+      flex-basis: 100%;
+      padding-left: calc(0.5rem + var(--space-1) + var(--space-2));
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .led {
+      animation: none;
+    }
+  }
+</style>

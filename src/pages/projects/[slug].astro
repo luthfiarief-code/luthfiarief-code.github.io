@@ -1,0 +1,235 @@
+---
+import { Image } from 'astro:assets';
+import { render, type CollectionEntry } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import TagList from '../../components/TagList.astro';
+import { getProjects } from '../../lib/projects';
+import { site } from '../../data/site';
+
+export async function getStaticPaths() {
+  const projects = await getProjects();
+  return projects.map((project, index) => ({
+    params: { slug: project.id },
+    props: {
+      project,
+      next: projects[(index + 1) % projects.length],
+    },
+  }));
+}
+
+interface Props {
+  project: CollectionEntry<'projects'>;
+  next: CollectionEntry<'projects'>;
+}
+
+const { project, next } = Astro.props;
+const { data } = project;
+const { Content } = await render(project);
+---
+
+<BaseLayout title={`${data.title} — ${site.shortName}`} description={data.impact} image={data.cover.src}>
+  <article class="case-study">
+    <header class="container case-header">
+      <a class="label back link-quiet" href="/#work">
+        <span aria-hidden="true">←</span> All work
+      </a>
+
+      <p class="label kind">{data.kind} · {data.year}</p>
+      <h1 class="title">{data.title}</h1>
+      <p class="lede">{data.impact}</p>
+
+      <dl class="meta">
+        <div>
+          <dt class="label">Role</dt>
+          <dd>{data.role}</dd>
+        </div>
+        <div>
+          <dt class="label">Timeline</dt>
+          <dd>{data.period}</dd>
+        </div>
+        {
+          data.status && (
+            <div>
+              <dt class="label">Status</dt>
+              <dd>{data.status}</dd>
+            </div>
+          )
+        }
+        <div class="meta-stack">
+          <dt class="label">Stack</dt>
+          <dd><TagList tags={data.stack} /></dd>
+        </div>
+      </dl>
+
+      {
+        data.links.length > 0 && (
+          <ul class="links" role="list">
+            {data.links.map((link) => (
+              <li>
+                <a class="link" href={link.href} rel="noopener">
+                  {link.label} <span aria-hidden="true">↗</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        )
+      }
+    </header>
+
+    <div class="container">
+      <figure class="cover">
+        <Image
+          src={data.cover}
+          alt={data.coverAlt}
+          widths={[720, 1120, 1680]}
+          sizes="(min-width: 72rem) 1120px, 100vw"
+          loading="eager"
+          fetchpriority="high"
+        />
+      </figure>
+
+      <div class="prose body">
+        <Content />
+      </div>
+    </div>
+
+    <nav class="container case-footer" aria-label="More projects">
+      <a class="label link-quiet" href="/#work"><span aria-hidden="true">←</span> All work</a>
+      {
+        next.id !== project.id && (
+          <a class="next" href={`/projects/${next.id}/`}>
+            <span class="label">Next project</span>
+            <span class="next-title">
+              {next.data.title} <span aria-hidden="true">→</span>
+            </span>
+          </a>
+        )
+      }
+    </nav>
+  </article>
+</BaseLayout>
+
+<style>
+  .case-header {
+    padding-top: var(--space-7);
+  }
+
+  .back {
+    display: inline-block;
+    margin-bottom: var(--space-8);
+  }
+
+  .back:hover {
+    color: var(--color-text);
+  }
+
+  .kind {
+    margin-bottom: var(--space-3);
+    color: var(--color-accent-text);
+  }
+
+  .title {
+    max-width: 20ch;
+    font-size: clamp(2.125rem, 1.6rem + 2.4vw, 3.25rem);
+    letter-spacing: -0.02em;
+    line-height: 1.08;
+  }
+
+  .lede {
+    max-width: var(--width-prose);
+    margin-top: var(--space-5);
+    font-size: var(--text-xl);
+    line-height: var(--leading-snug);
+    color: var(--color-text-muted);
+  }
+
+  .meta {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+    gap: var(--space-5) var(--space-6);
+    margin-top: var(--space-7);
+    padding-top: var(--space-5);
+    border-top: var(--border);
+  }
+
+  .meta div {
+    display: grid;
+    gap: var(--space-2);
+    align-content: start;
+  }
+
+  .meta dd {
+    margin: 0;
+    font-size: var(--text-sm);
+  }
+
+  .meta-stack {
+    grid-column: 1 / -1;
+  }
+
+  @media (min-width: 60rem) {
+    .meta {
+      grid-template-columns: repeat(3, minmax(0, 12rem)) minmax(0, 1fr);
+    }
+
+    .meta-stack {
+      grid-column: auto;
+    }
+  }
+
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3) var(--space-6);
+    margin-top: var(--space-5);
+    font-size: var(--text-sm);
+  }
+
+  .cover {
+    margin-block: var(--space-7) var(--space-4);
+    overflow: hidden;
+    background: var(--color-surface);
+    border: var(--border);
+    border-radius: var(--radius-md);
+  }
+
+  .cover :global(img) {
+    width: 100%;
+  }
+
+  .body {
+    margin-inline: auto;
+  }
+
+  .case-footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    justify-content: space-between;
+    gap: var(--space-5);
+    margin-top: var(--space-9);
+    padding-top: var(--space-6);
+    border-top: var(--border);
+  }
+
+  .case-footer > a.label:hover {
+    color: var(--color-text);
+  }
+
+  .next {
+    display: grid;
+    gap: var(--space-1);
+    text-align: right;
+    margin-left: auto;
+  }
+
+  .next-title {
+    font-size: var(--text-lg);
+    font-weight: var(--weight-medium);
+    transition: color var(--duration-fast) var(--ease-out);
+  }
+
+  .next:hover .next-title {
+    color: var(--color-accent-text);
+  }
+</style>

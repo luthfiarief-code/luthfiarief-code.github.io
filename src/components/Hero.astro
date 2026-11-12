@@ -1,0 +1,85 @@
+---
+import Button from './Button.astro';
+import StatusLine from './StatusLine.astro';
+import { site } from '../data/site';
+---
+
+<section class="hero" aria-labelledby="hero-title">
+  <div class="hero-grid" aria-hidden="true"></div>
+  <div class="container hero-inner">
+    <p class="label hero-eyebrow">{site.hero.eyebrow}</p>
+    <h1 id="hero-title" class="hero-title">{site.name}</h1>
+    <p class="hero-tagline">{site.hero.tagline}</p>
+
+    <StatusLine label={site.hero.status.label} detail={site.hero.status.detail} />
+
+    <div class="hero-actions">
+      <Button href={site.cvHref} download={site.cvFileName} variant="primary">
+        <svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true">
+          <path
+            d="M8 2.5v8m0 0L4.75 7.25M8 10.5l3.25-3.25M3 13.5h10"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"></path>
+        </svg>
+        Download CV
+      </Button>
+      <Button href="#contact" variant="secondary">Get in touch</Button>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    isolation: isolate;
+    padding-block: clamp(var(--space-8), 10vw, var(--space-10)) clamp(var(--space-8), 8vw, var(--space-9));
+    border-bottom: var(--border);
+    overflow: hidden;
+  }
+
+  /* Perfboard dot grid — hero only. Fades out toward the edges. */
+  .hero-grid {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-image: radial-gradient(var(--color-grid-dot) 1.1px, transparent 1.3px);
+    background-size: 22px 22px;
+    background-position: -11px -11px;
+    mask-image: radial-gradient(ellipse 85% 90% at 70% 40%, #000 30%, transparent 85%);
+    -webkit-mask-image: radial-gradient(ellipse 85% 90% at 70% 40%, #000 30%, transparent 85%);
+  }
+
+  .hero-eyebrow {
+    margin-bottom: var(--space-5);
+  }
+
+  .hero-title {
+    max-width: 14ch;
+    font-size: var(--text-display);
+    font-weight: var(--weight-semibold);
+    line-height: 1.02;
+    letter-spacing: var(--tracking-display);
+  }
+
+  .hero-tagline {
+    max-width: 34ch;
+    margin-top: var(--space-5);
+    font-size: var(--text-xl);
+    line-height: var(--leading-snug);
+    color: var(--color-text-muted);
+  }
+
+  .hero-inner > :global(.status) {
+    margin-top: var(--space-6);
+  }
+
+  .hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    margin-top: var(--space-6);
+  }
+</style>

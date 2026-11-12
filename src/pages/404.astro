@@ -1,0 +1,35 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Button from '../components/Button.astro';
+import { site } from '../data/site';
+---
+
+<BaseLayout title={`Page not found — ${site.shortName}`}>
+  <section class="container not-found">
+    <p class="label"><span class="code">404</span> — Open circuit</p>
+    <h1>Nothing is connected here.</h1>
+    <p class="muted">The page you were looking for doesn’t exist, or it moved.</p>
+    <Button href="/">Back to the homepage</Button>
+  </section>
+</BaseLayout>
+
+<style>
+  .not-found {
+    display: grid;
+    justify-items: start;
+    gap: var(--space-5);
+    padding-block: var(--space-10);
+  }
+
+  .code {
+    color: var(--color-accent-text);
+  }
+
+  h1 {
+    font-size: var(--text-2xl);
+  }
+
+  .muted {
+    color: var(--color-text-muted);
+  }
+</style>
