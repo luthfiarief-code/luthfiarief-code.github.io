@@ -56,8 +56,9 @@ import { site } from '../data/site';
     margin-bottom: var(--space-5);
   }
 
+  /* One line where it fits; on narrow screens `text-wrap: balance` (global h1)
+     breaks it as "Muhammad / Luthfi Arief" rather than leaving "Arief" alone. */
   .hero-title {
-    max-width: 14ch;
     font-size: var(--text-display);
     font-weight: var(--weight-semibold);
     line-height: 1.02;
